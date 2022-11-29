@@ -29,7 +29,7 @@
 .repos {
   margin: 0 25px;
   margin-top: auto;
-  overflow-y:auto;
+  overflow-y: auto;
   height: auto;
   display: flex;
   flex-direction: column-reverse;
@@ -56,4 +56,9 @@
     50% 50%;
   background-size: 50px;
   background-repeat: no-repeat;
+}
+
+.status {
+  left: 40px;
+  position: absolute;
 }

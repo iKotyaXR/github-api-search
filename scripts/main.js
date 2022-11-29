@@ -3,25 +3,33 @@
   let input = document.querySelector('.input');
   let resultsContainer = document.querySelector('.results');
   let reposContainer = document.querySelector('.repos');
+  let status = document.querySelector('.status');
   let getReposDeb = debounce(getRepos, 700);
+  let eventListeners = new Map();
+
   input.addEventListener('input', async () => {
+    status.textContent = input.value.length == 0 ? '' : 'Ожидание';
     removeCards();
     if (input.value)
       await getReposDeb(input.value)
         .then((res) => {
+          status.textContent = `${res.length != 0 ? 'Найдено: ' + res.length : 'Репозиториев нет'}`;
           for (rep of res) {
             let card = createCard(rep.name);
-
             let { owner, name, stargazers_count: stars } = rep;
-            card.addEventListener('click', function () {
+            let listener = function () {
               createRepo(name, owner.login, stars);
-              input.value = ''
-              removeCards()
-            });
+              input.value = '';
+              removeCards();
+              status.textContent = '';
+            };
+            card.addEventListener('click', listener);
+            eventListeners.set(card, listener);
           }
         })
         .catch((err) => {
           alert('Ошибка api');
+          status.textContent = "Ошибка API ;)"
         });
   });
 
@@ -42,7 +50,13 @@
 
   function removeCards() {
     let cards = document.querySelectorAll('.results__item');
-    for (let card of cards) card.remove();
+    for (let card of cards) {
+      card.remove();
+      for (lstnr of eventListeners) {
+        lstnr[0].removeEventListener('click', lstnr[1]);
+      }
+      eventListeners.clear();
+    }
   }
 
   function createRepo(name, owner, stars) {
@@ -57,7 +71,8 @@
     repItem.classList.add('repos__item');
     data.classList.add('repos__item__data');
     button.classList.add('repos__item__button');
-    button.addEventListener('click', () => {
+    button.addEventListener('click', function () {
+      button.removeEventListener('click', arguments.callee);
       repItem.remove();
     });
     repItem.append(data, button);
