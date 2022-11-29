@@ -6,6 +6,7 @@
   border: 1px solid gray;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .input {
   display: block;
@@ -59,6 +60,6 @@
 }
 
 .status {
-  left: 40px;
+  left: 25px;
   position: absolute;
 }
